@@ -1,5 +1,6 @@
 module.exports = {
     // cache: true,
+    mode: 'development',
     watch: true,
     watchOptions: {
         aggregateTimeout: 100

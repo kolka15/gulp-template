@@ -4,24 +4,30 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "watch": "gulp go & gulp js:dev",
     "check": "NODE_ENV=check webpack --config gulp-webpack.prod.js"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "global": "^4.3.2"
+  },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
     "browser-sync": "^2.24.6",
-    "gulp": "gulpjs/gulp#4.0",
+    "gulp": "^4.0.0",
     "gulp-autoprefixer": "^5.0.0",
     "gulp-clean-css": "^3.9.4",
+    "gulp-cli": "gulpjs/gulp-cli",
     "gulp-sass": "^4.0.1",
     "gulp-sass-glob": "^1.0.9",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-webpack": "^1.5.0",
+    "svg4everybody": "^2.1.9",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.16.2",
     "webpack-bundle-analyzer": "^2.13.1",

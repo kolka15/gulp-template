@@ -3,11 +3,11 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const webpack = require('webpack');
 
 let config = {
+    mode: 'production',
     watchOptions: {
         aggregateTimeout: 100
     },
     entry: ['babel-polyfill', './src/js/entrance.js'],
-    devtool: '#source-map',
     output: {
         filename: "bundle.js",
         library: "myLibrary",
@@ -32,10 +32,6 @@ let config = {
                 },
             }
         }),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('prod')
-        })
-
     ]
 };
 

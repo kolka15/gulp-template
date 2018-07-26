@@ -1,4 +1,4 @@
-const gulp = import('gulp');
+const gulp = require('gulp');
 
 const sass = require('gulp-sass');
 const sassGlob = require('gulp-sass-glob');
@@ -8,20 +8,20 @@ const cleanCSS = require('gulp-clean-css');
 
 const webpack = require('webpack-stream');
 
-const browserSync = import('browser-sync').create();
+const browserSync = require('browser-sync').create();
 const reload = browserSync.reload;
 
-const path = {
-    src: './src',
-    srcCss: `${this.src}/css`,
-    srcJS: `${this.src}/js`,
-    srcAssets: `${this.src}/assets`,
-    srcAssetsJs: `${this.srcAssets}/js`,
-    srcAssetsCss: `${this.srcAssets}/css`,
-    dist: './dist',
-    distAssets: `${this.dist}/assets`,
-    distAssetsCss: `${this.distAssets}/css`,
-    distAssetsJs: `${this.distAssets}/js`,
+const path = new function () {
+    this.src = './src';
+    this.srcCss = `${this.src}/css`;
+    this.srcJS = `${this.src}/js`;
+    this.srcAssets = `${this.src}/assets`;
+    this.srcAssetsJs = `${this.srcAssets}/js`;
+    this.srcAssetsCss = `${this.srcAssets}/css`;
+    this.dist = './app';
+    this.distAssets = `${this.dist}/assets`;
+    this.distAssetsCss = `${this.distAssets}/css`;
+    this.distAssetsJs = `${this.distAssets}/js`;
 };
 
 const browsrSyncOpts = {
@@ -29,6 +29,7 @@ const browsrSyncOpts = {
     open: false,
     notify: false,
     ghostMode: false,
+    port: 3000,
     server: {
         baseDir: "./src"
     }
@@ -46,9 +47,14 @@ const cleanCssOpts = {
  *
  * */
 
+const sassGlobOpts = {
+    allowEmpty: true
+
+};
+
 gulp.task('sass', function () {
     return gulp.src(`${path.srcCss}/main.scss`)
-        .pipe(sassGlob())
+        .pipe(sassGlob(sassGlobOpts))
         .pipe(sourcemaps.init())
         .pipe(sass())
         // .on('error', swallowError)
@@ -58,9 +64,9 @@ gulp.task('sass', function () {
         .pipe(browserSync.stream())
 });
 
-gulp.task('sass:build', function () {
+gulp.task('sass:prod', function () {
     return gulp.src(`${path.srcCss}/main.scss`)
-        .pipe(sassGlob())
+        .pipe(sassGlob(sassGlobOpts))
         .pipe(sass())
         .pipe(autoprefixer({
             browsers: ['last 3 versions', 'ie >=9']
@@ -76,20 +82,17 @@ gulp.task('sass:build', function () {
  *
  * */
 
-gulp.task('js:dev', function() {
-    return gulp.src('src/entry.js')
-        .pipe(webpack(import('./gulp-webpack.dev.js')))
-        .pipe(gulp.dest(path.srcJS));
+gulp.task('js:dev', function () {
+    return gulp.src('./src/js/entrance.js')
+        .pipe(webpack(require('./gulp-webpack.dev.js')))
+        .pipe(gulp.dest(path.srcAssetsJs));
 });
 
-gulp.task('js:buid', function() {
-    return gulp.src('src/entry.js')
-        .pipe(webpack(import('./gulp-webpack.prod.js')))
+gulp.task('js:prod', function () {
+    return gulp.src('./src/js/entrance.js')
+        .pipe(webpack(require('./gulp-webpack.prod.js')))
         .pipe(gulp.dest(path.distAssetsJs));
 });
-
-
-
 
 
 /**
@@ -101,9 +104,20 @@ gulp.task('js:buid', function() {
 gulp.task('go', function () {
     browserSync.init(browsrSyncOpts);
     gulp.watch(`${path.srcCss}/**/*.scss`, gulp.series('sass'));
-    gulp.watch(`${path.srcJS}/**/*.js`, gulp.series('js')).on('change', reload);
+    gulp.watch(`${path.srcAssetsJs}/**/*.js`).on('change', reload);
     gulp.watch(`${path.src}/*.html`).on('change', reload);
 });
+
+/**
+ *
+ *  prod
+ *
+ * */
+
+
+gulp.task('build', gulp.parallel(['sass:prod', 'js:prod']));
+
+
 
 function swallowError(error) {
     console.log(error.toString());
