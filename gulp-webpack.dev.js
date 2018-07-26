@@ -4,18 +4,18 @@ module.exports = {
     watchOptions: {
         aggregateTimeout: 100
     },
-    entry: ['babel-polyfill', './web/js/entrance.js'],
+    entry: ['babel-polyfill', './src/js/entrance.js'],
     devtool: '#source-map',
     output: {
         filename: "bundle.js",
         library: "myLibrary",
         publicPath: '/assets/js/'
     },
-
-    externals: {
-        $: "jquery",
-        jquery: "jQuery",
-    },
+    //
+    // externals: {
+    //     $: "jquery",
+    //     jquery: "jQuery",
+    // },
     module: {
         rules: [
             {
@@ -27,7 +27,4 @@ module.exports = {
             }
         ]
     },
-    plugins: [
-        // new UglifyJSPlugin({}),
-    ]
 };

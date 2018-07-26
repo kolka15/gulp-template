@@ -16,9 +16,12 @@ const path = {
     srcCss: `${this.src}/css`,
     srcJS: `${this.src}/js`,
     srcAssets: `${this.src}/assets`,
+    srcAssetsJs: `${this.srcAssets}/js`,
+    srcAssetsCss: `${this.srcAssets}/css`,
     dist: './dist',
-    distCss: `${this.dist}/css`,
-    distJs: `${this.dist}/js`,
+    distAssets: `${this.dist}/assets`,
+    distAssetsCss: `${this.distAssets}/css`,
+    distAssetsJs: `${this.distAssets}/js`,
 };
 
 const browsrSyncOpts = {
@@ -51,7 +54,7 @@ gulp.task('sass', function () {
         // .on('error', swallowError)
         .pipe(sourcemaps.write('.'))
         // .on('error', swallowError)
-        .pipe(gulp.dest(`${path.srcAssets}/css`))
+        .pipe(gulp.dest(path.srcAssetsCss))
         .pipe(browserSync.stream())
 });
 
@@ -63,7 +66,7 @@ gulp.task('sass:build', function () {
             browsers: ['last 3 versions', 'ie >=9']
         }))
         .pipe(cleanCSS(cleanCssOpts))
-        .pipe(gulp.dest(path.distCss))
+        .pipe(gulp.dest(path.distAssetsCss))
 });
 
 
@@ -73,11 +76,20 @@ gulp.task('sass:build', function () {
  *
  * */
 
-gulp.task('js:build', function() {
+gulp.task('js:dev', function() {
     return gulp.src('src/entry.js')
         .pipe(webpack(import('./gulp-webpack.dev.js')))
-        .pipe(gulp.dest(path.distJs));
+        .pipe(gulp.dest(path.srcJS));
 });
+
+gulp.task('js:buid', function() {
+    return gulp.src('src/entry.js')
+        .pipe(webpack(import('./gulp-webpack.prod.js')))
+        .pipe(gulp.dest(path.distAssetsJs));
+});
+
+
+
 
 
 /**
