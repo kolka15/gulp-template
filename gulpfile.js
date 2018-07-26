@@ -75,8 +75,8 @@ gulp.task('sass:build', function () {
 
 gulp.task('js:build', function() {
     return gulp.src('src/entry.js')
-        .pipe(webpack())
-        .pipe(gulp.dest('dist/'));
+        .pipe(webpack(import('./gulp-webpack.dev.js')))
+        .pipe(gulp.dest(path.distJs));
 });
 
 
