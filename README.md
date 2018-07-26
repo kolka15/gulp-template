@@ -1,4 +1,13 @@
 # gulp-template
 gulp template
 
-watch: [code]npm run watch[/code]
+watch: 
+```JavaScript
+npm run watch
+```
+build:
+```JavaScript
+gulp build
+```
+
+
