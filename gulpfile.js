@@ -83,15 +83,27 @@ gulp.task('sass:prod', function () {
  * */
 
 gulp.task('js:dev', function () {
-    return gulp.src('./src/js/entrance.js')
+    return gulp.src(`${path.srcJS}/entrance.js`)
         .pipe(webpack(require('./gulp-webpack.dev.js')))
         .pipe(gulp.dest(path.srcAssetsJs));
 });
 
 gulp.task('js:prod', function () {
-    return gulp.src('./src/js/entrance.js')
+    return gulp.src(`${path.srcJS}/entrance.js`)
         .pipe(webpack(require('./gulp-webpack.prod.js')))
         .pipe(gulp.dest(path.distAssetsJs));
+});
+
+
+/**
+ *
+ * html copy
+ *
+ * */
+
+gulp.task('html:dist', function () {
+    return gulp.src(`${path.src}/*.html`)
+        .pipe(gulp.dest(path.dist));
 });
 
 
@@ -108,16 +120,14 @@ gulp.task('go', function () {
     gulp.watch(`${path.src}/*.html`).on('change', reload);
 });
 
+
 /**
  *
  *  prod
  *
  * */
 
-
-gulp.task('build', gulp.parallel(['sass:prod', 'js:prod']));
-
-
+gulp.task('build', gulp.parallel(['sass:prod', 'js:prod', 'html:dist']));
 
 function swallowError(error) {
     console.log(error.toString());
