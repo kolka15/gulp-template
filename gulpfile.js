@@ -114,7 +114,7 @@ gulp.task('fileinclude', function () {
         .pipe(gulp.dest(path.src));
 });
 
-gulp.task('fileinclude:dist', function () {
+gulp.task('fileinclude:prod', function () {
     return gulp.src(`${path.srcHtml}/*.html`)
         .pipe(fileinclude({
             prefix: '@@',
@@ -160,7 +160,7 @@ gulp.task('go', function () {
  *
  * */
 
-gulp.task('build', gulp.series('clean', gulp.parallel(['fileinclude', 'fileinclude:dist', 'sass:prod', 'js:prod'])));
+gulp.task('build', gulp.series('clean', gulp.parallel(['fileinclude', 'fileinclude:prod', 'sass:prod', 'js:prod'])));
 
 
 function swallowError(error) {
