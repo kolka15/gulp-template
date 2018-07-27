@@ -22,10 +22,10 @@ const path = new function () {
     this.srcAssets = `${this.src}/assets`;
     this.srcAssetsJs = `${this.srcAssets}/js`;
     this.srcAssetsCss = `${this.srcAssets}/css`;
-    this.dist = './app';
-    this.distAssets = `${this.dist}/assets`;
-    this.distAssetsCss = `${this.distAssets}/css`;
-    this.distAssetsJs = `${this.distAssets}/js`;
+    this.prod = './app';
+    this.prodAssets = `${this.prod}/assets`;
+    this.prodAssetsCss = `${this.prodAssets}/css`;
+    this.prodAssetsJs = `${this.prodAssets}/js`;
 };
 
 const browsrSyncOpts = {
@@ -76,7 +76,7 @@ gulp.task('sass:prod', function () {
             browsers: ['last 3 versions', 'ie >=9']
         }))
         .pipe(cleanCSS(cleanCssOpts))
-        .pipe(gulp.dest(path.distAssetsCss))
+        .pipe(gulp.dest(path.prodAssetsCss))
 });
 
 
@@ -95,7 +95,7 @@ gulp.task('js:dev', function () {
 gulp.task('js:prod', function () {
     return gulp.src(`${path.srcJS}/entrance.js`)
         .pipe(webpack(require('./gulp-webpack.prod.js')))
-        .pipe(gulp.dest(path.distAssetsJs));
+        .pipe(gulp.dest(path.prodAssetsJs));
 });
 
 
@@ -120,12 +120,12 @@ gulp.task('fileinclude:prod', function () {
             prefix: '@@',
             basepath: '@file'
         }))
-        .pipe(gulp.dest(path.dist));
+        .pipe(gulp.dest(path.prod));
 });
 
-// gulp.task('html:dist', function () {
+// gulp.task('html:prod', function () {
 //     return gulp.src(`${path.src}/*.html`)
-//         .pipe(gulp.dest(path.dist));
+//         .pipe(gulp.dest(path.prod));
 // });
 
 
@@ -136,7 +136,7 @@ gulp.task('fileinclude:prod', function () {
  * */
 
 gulp.task('clean', function () {
-    return del([`${path.dist}/**`, `${path.src}/*.html`]);
+    return del([`${path.prod}/**`, `${path.src}/*.html`]);
 });
 
 
