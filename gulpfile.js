@@ -123,11 +123,6 @@ gulp.task('fileinclude:prod', function () {
         .pipe(gulp.dest(path.prod));
 });
 
-// gulp.task('html:prod', function () {
-//     return gulp.src(`${path.src}/*.html`)
-//         .pipe(gulp.dest(path.prod));
-// });
-
 
 /**
  *
