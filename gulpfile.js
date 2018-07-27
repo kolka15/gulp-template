@@ -8,6 +8,9 @@ const cleanCSS = require('gulp-clean-css');
 
 const webpack = require('webpack-stream');
 
+const fileinclude = require('gulp-file-include');
+const del = require('del');
+
 const browserSync = require('browser-sync').create();
 const reload = browserSync.reload;
 
@@ -15,6 +18,7 @@ const path = new function () {
     this.src = './src';
     this.srcCss = `${this.src}/css`;
     this.srcJS = `${this.src}/js`;
+    this.srcHtml = `${this.src}/html`;
     this.srcAssets = `${this.src}/assets`;
     this.srcAssetsJs = `${this.srcAssets}/js`;
     this.srcAssetsCss = `${this.srcAssets}/css`;
@@ -97,13 +101,42 @@ gulp.task('js:prod', function () {
 
 /**
  *
- * html copy
+ * html
  *
  * */
 
-gulp.task('html:dist', function () {
-    return gulp.src(`${path.src}/*.html`)
+gulp.task('fileinclude', function () {
+    return gulp.src(`${path.srcHtml}/*.html`)
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
+        .pipe(gulp.dest(path.src));
+});
+
+gulp.task('fileinclude:dist', function () {
+    return gulp.src(`${path.srcHtml}/*.html`)
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
         .pipe(gulp.dest(path.dist));
+});
+
+// gulp.task('html:dist', function () {
+//     return gulp.src(`${path.src}/*.html`)
+//         .pipe(gulp.dest(path.dist));
+// });
+
+
+/**
+ *
+ * clean
+ *
+ * */
+
+gulp.task('clean', function () {
+    return del([`${path.dist}/**`, `${path.src}/*.html`]);
 });
 
 
@@ -117,7 +150,7 @@ gulp.task('go', function () {
     browserSync.init(browsrSyncOpts);
     gulp.watch(`${path.srcCss}/**/*.scss`, gulp.series('sass'));
     gulp.watch(`${path.srcAssetsJs}/**/*.js`).on('change', reload);
-    gulp.watch(`${path.src}/*.html`).on('change', reload);
+    gulp.watch(`${path.srcHtml}/**/*.html`, gulp.series('fileinclude')).on('change', reload);
 });
 
 
@@ -127,7 +160,8 @@ gulp.task('go', function () {
  *
  * */
 
-gulp.task('build', gulp.parallel(['sass:prod', 'js:prod', 'html:dist']));
+gulp.task('build', gulp.series('clean', gulp.parallel(['fileinclude', 'fileinclude:dist', 'sass:prod', 'js:prod'])));
+
 
 function swallowError(error) {
     console.log(error.toString());
