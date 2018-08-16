@@ -105,21 +105,20 @@ gulp.task('js:prod', function () {
  *
  * */
 
+const fileincludeOpts = {
+    prefix: '@@',
+    basepath: '@file'
+};
+
 gulp.task('fileinclude', function () {
     return gulp.src(`${path.srcHtml}/*.html`)
-        .pipe(fileinclude({
-            prefix: '@@',
-            basepath: '@file'
-        }))
+        .pipe(fileinclude(fileincludeOpts))
         .pipe(gulp.dest(path.src));
 });
 
 gulp.task('fileinclude:prod', function () {
     return gulp.src(`${path.srcHtml}/*.html`)
-        .pipe(fileinclude({
-            prefix: '@@',
-            basepath: '@file'
-        }))
+        .pipe(fileinclude(fileincludeOpts))
         .pipe(gulp.dest(path.prod));
 });
 
