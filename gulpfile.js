@@ -5,28 +5,30 @@ const sassGlob = require('gulp-sass-glob');
 const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const cleanCSS = require('gulp-clean-css');
+const pug = require('gulp-pug');
 
 const webpack = require('webpack-stream');
 
-const fileinclude = require('gulp-file-include');
 const del = require('del');
 
 const browserSync = require('browser-sync').create();
 const reload = browserSync.reload;
 
-const path = new function () {
-    this.src = './src';
-    this.srcCss = `${this.src}/css`;
-    this.srcJS = `${this.src}/js`;
-    this.srcHtml = `${this.src}/html`;
-    this.srcAssets = `${this.src}/assets`;
-    this.srcAssetsJs = `${this.srcAssets}/js`;
-    this.srcAssetsCss = `${this.srcAssets}/css`;
-    this.prod = './app';
-    this.prodAssets = `${this.prod}/assets`;
-    this.prodAssetsCss = `${this.prodAssets}/css`;
-    this.prodAssetsJs = `${this.prodAssets}/js`;
-};
+
+const src = './src';
+const prod = './app';
+const srcJS = `${src}/js`;
+const srcCss = `${src}/css`;
+const srcImg = `${src}/img`
+const srcPug = `${src}/pug`;
+const srcAssets = `${src}/assets`;
+const prodImg = `${prod}/img`;
+const prodAssets = `${prod}/assets`;
+const srcAssetsJs = `${srcAssets}/js`;
+const srcAssetsCss = `${srcAssets}/css`;
+const prodAssetsJs = `${prodAssets}/js`;
+const prodAssetsCss = `${prodAssets}/css`;
+
 
 const browsrSyncOpts = {
     https: false,
@@ -57,26 +59,26 @@ const sassGlobOpts = {
 };
 
 gulp.task('sass', function () {
-    return gulp.src(`${path.srcCss}/main.scss`)
+    return gulp.src(`${srcCss}/main.scss`)
         .pipe(sassGlob(sassGlobOpts))
         .pipe(sourcemaps.init())
         .pipe(sass())
         // .on('error', swallowError)
         .pipe(sourcemaps.write('.'))
         // .on('error', swallowError)
-        .pipe(gulp.dest(path.srcAssetsCss))
+        .pipe(gulp.dest(srcAssetsCss))
         .pipe(browserSync.stream())
 });
 
 gulp.task('sass:prod', function () {
-    return gulp.src(`${path.srcCss}/main.scss`)
+    return gulp.src(`${srcCss}/main.scss`)
         .pipe(sassGlob(sassGlobOpts))
         .pipe(sass())
         .pipe(autoprefixer({
             browsers: ['last 3 versions', 'ie >=9']
         }))
         .pipe(cleanCSS(cleanCssOpts))
-        .pipe(gulp.dest(path.prodAssetsCss))
+        .pipe(gulp.dest(prodAssetsCss))
 });
 
 
@@ -87,39 +89,38 @@ gulp.task('sass:prod', function () {
  * */
 
 gulp.task('js:dev', function () {
-    return gulp.src(`${path.srcJS}/entrance.js`)
+    return gulp.src(`${srcJS}entrance.js`)
         .pipe(webpack(require('./gulp-webpack.dev.js')))
-        .pipe(gulp.dest(path.srcAssetsJs));
+        .pipe(gulp.dest(srcAssetsJs));
 });
 
 gulp.task('js:prod', function () {
-    return gulp.src(`${path.srcJS}/entrance.js`)
+    return gulp.src(`${srcJS}/entrance.js`)
         .pipe(webpack(require('./gulp-webpack.prod.js')))
-        .pipe(gulp.dest(path.prodAssetsJs));
+        .pipe(gulp.dest(prodAssetsJs));
 });
 
 
 /**
  *
- * html
+ * html, pug
  *
  * */
 
-const fileincludeOpts = {
-    prefix: '@@',
-    basepath: '@file'
-};
+const pugOpts = {
+    pretty: true
+}
 
-gulp.task('fileinclude', function () {
-    return gulp.src(`${path.srcHtml}/*.html`)
-        .pipe(fileinclude(fileincludeOpts))
-        .pipe(gulp.dest(path.src));
+gulp.task('pug', function buildHTML() {
+    return gulp.src(`${srcPug}/*.pug`)
+        .pipe(pug(pugOpts))
+        .pipe(gulp.dest(src));
 });
 
-gulp.task('fileinclude:prod', function () {
-    return gulp.src(`${path.srcHtml}/*.html`)
-        .pipe(fileinclude(fileincludeOpts))
-        .pipe(gulp.dest(path.prod));
+gulp.task('pug:prod', function buildHTML() {
+    return gulp.src(`${srcPug}/*.pug`)
+        .pipe(pug(pugOpts))
+        .pipe(gulp.dest(prod));
 });
 
 
@@ -130,7 +131,19 @@ gulp.task('fileinclude:prod', function () {
  * */
 
 gulp.task('clean', function () {
-    return del([`${path.prod}/**`, `${path.src}/*.html`]);
+    return del([`${prod}/**`, `${src}/*.html`]);
+});
+
+/**
+ *
+ * img copy
+ *
+ * */
+
+gulp.task('img:copy', function () {
+    return gulp.src(`${srcJS}entrance.js`)
+        .pipe(webpack(require('./gulp-webpack.dev.js')))
+        .pipe(gulp.dest(srcAssetsJs));
 });
 
 
@@ -142,9 +155,9 @@ gulp.task('clean', function () {
 
 gulp.task('go', function () {
     browserSync.init(browsrSyncOpts);
-    gulp.watch(`${path.srcCss}/**/*.scss`, gulp.series('sass'));
-    gulp.watch(`${path.srcAssetsJs}/**/*.js`).on('change', reload);
-    gulp.watch(`${path.srcHtml}/**/*.html`, gulp.series('fileinclude')).on('change', reload);
+    gulp.watch(`${srcCss}/**/*.scss`, gulp.series('sass'));
+    gulp.watch(`${srcAssetsJs}/**/*.js`).on('change', reload);
+    gulp.watch(`${srcPug}/**/*.pug`, gulp.series('pug')).on('change', reload);
 });
 
 
@@ -154,7 +167,7 @@ gulp.task('go', function () {
  *
  * */
 
-gulp.task('build', gulp.series('clean', gulp.parallel(['fileinclude', 'fileinclude:prod', 'sass:prod', 'js:prod'])));
+gulp.task('default', gulp.series('clean', gulp.parallel(['pug', 'pug:prod', 'sass:prod', 'js:prod'])));
 
 
 function swallowError(error) {
