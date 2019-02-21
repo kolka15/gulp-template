@@ -1,5 +1,5 @@
 # gulp-template
-gulp template (webpack, es6, babel, sass, html includes)
+gulp template (webpack, es6, babel, sass, pug)
 
 watch: 
 ```JavaScript
@@ -9,5 +9,3 @@ build:
 ```JavaScript
 gulp build
 ```
-
-
