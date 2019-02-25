@@ -19,7 +19,6 @@ const del = require('del');
 const browserSync = require('browser-sync').create();
 const reload = browserSync.reload;
 
-
 const src = './src';
 const prod = './app';
 const srcJS = `${src}/js`;
@@ -33,9 +32,10 @@ const prodImg = `${prod}/img`;
 const prodAssets = `${prod}/assets`;
 const srcAssetsJs = `${srcAssets}/js`;
 const srcAssetsCss = `${srcAssets}/css`;
+const srcAssetsFonts = `${srcAssets}/fonts`;
 const prodAssetsJs = `${prodAssets}/js`;
 const prodAssetsCss = `${prodAssets}/css`;
-
+const prodAssetsFonts = `${prodAssets}/fonts`;
 
 const browsrSyncOpts = {
     https: false,
@@ -140,6 +140,19 @@ gulp.task('pug:prod', function buildHTML() {
 gulp.task('clean', function () {
     return del([`${prod}/**`, `${src}/*.html`]);
 });
+
+
+/**
+ *
+ * fonts copy
+ *
+ * */
+
+gulp.task('copy:fonts', function () {
+    return gulp.src(`${srcAssetsFonts}/**/*`)
+        .pipe(gulp.dest(prodAssetsFonts));
+});
+
 
 /**
  *
@@ -302,7 +315,7 @@ gulp.task('go', function () {
  *
  * */
 
-gulp.task('default', gulp.series('clean', gulp.parallel(['pug', 'pug:prod', 'sass:prod', 'js:prod'])));
+gulp.task('default', gulp.series('clean', gulp.parallel(['pug', 'pug:prod', 'sass:prod', 'js:prod', 'copy:fonts'])));
 
 
 function swallowError(error) {
