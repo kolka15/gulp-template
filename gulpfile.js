@@ -19,8 +19,10 @@ const del = require('del');
 const browserSync = require('browser-sync').create();
 const reload = browserSync.reload;
 
+
 const src = './src';
-const prod = './app';
+const prod = './dist';
+const docs = './docs';
 const srcJS = `${src}/js`;
 const srcCss = `${src}/css`;
 const srcImg = `${src}/img`
@@ -36,6 +38,7 @@ const srcAssetsFonts = `${srcAssets}/fonts`;
 const prodAssetsJs = `${prodAssets}/js`;
 const prodAssetsCss = `${prodAssets}/css`;
 const prodAssetsFonts = `${prodAssets}/fonts`;
+
 
 const browsrSyncOpts = {
     https: false,
@@ -96,7 +99,7 @@ gulp.task('sass:prod', function () {
  * */
 
 gulp.task('js:dev', function () {
-    return gulp.src(`${srcJS}entrance.js`)
+    return gulp.src(`${srcJS}/entrance.js`)
         .pipe(webpack(require('./gulp-webpack.dev.js')))
         .pipe(gulp.dest(srcAssetsJs));
 });
@@ -166,12 +169,6 @@ gulp.task('img-min', function () {
         .pipe(gulp.dest(`${srcImg}`))
 });
 
-gulp.task('img:copy', function () {
-    return gulp.src(`${srcJS}entrance.js`)
-        .pipe(webpack(require('./gulp-webpack.dev.js')))
-        .pipe(gulp.dest(srcAssetsJs));
-});
-
 gulp.task('sprite', function () {
     return gulp.src(`${srcImg}/raster/sprite-smith/*.png`).pipe(spritesmith({
         imgName: 'sprite.png',
@@ -187,6 +184,12 @@ gulp.task('sprite', function () {
         .pipe(gulp.dest(`${srcImg}`));
 });
 
+gulp.task('img:copy', function () {
+    return gulp.src([`${srcImg}/**/*`, `!${srcImgVector}/symbol/**`, `!${srcImgVector}/css-sprite/**`, `!${srcImgRaster}/sprite-smith/**`])
+        .pipe(gulp.dest(prodImg))
+        .pipe(gulp.dest(`${docs}/img`))
+
+});
 
 /**
  *
@@ -223,7 +226,7 @@ gulp.task('svg-sprite:css', function () {
             dest: '.',
             shape: {
                 spacing: {         // Add padding
-                    padding: 1
+                    padding: 2
                 }
             },
             mode: {
@@ -297,6 +300,39 @@ gulp.task('svg',
 
 /**
  *
+ * copy to docs
+ *
+ * */
+
+gulp.task('copy:docs', function () {
+    return gulp.src(`${prod}/**/*`)
+        .on('error', swallowError)
+        .pipe(gulp.dest('./docs'));
+});
+
+gulp.task('replace_html:docs', function () {
+    return gulp.src(`${docs}/*.html`)
+        .pipe(replace('/assets', '/docs/assets'))
+        .pipe(gulp.dest(`${docs}`))
+});
+
+gulp.task('replace_css:docs', function () {
+    return gulp.src(`${docs}/assets/css/*.css`)
+        .pipe(replace('/img', '/docs/img'))
+        .pipe(replace('/assets', '/docs/assets'))
+        .pipe(gulp.dest(`${docs}/assets/css`))
+});
+
+
+
+gulp.task('docs',
+    gulp.series('copy:docs', gulp.parallel('replace_html:docs', 'replace_css:docs'))
+);
+
+
+
+/**
+ *
  *  watcher
  *
  * */
@@ -315,7 +351,7 @@ gulp.task('go', function () {
  *
  * */
 
-gulp.task('default', gulp.series('clean', gulp.parallel(['pug', 'pug:prod', 'sass:prod', 'js:prod', 'copy:fonts'])));
+gulp.task('default', gulp.series('clean', gulp.parallel(['pug', 'pug:prod', 'sass:prod', 'js:prod', 'copy:fonts', 'img:copy']), 'docs'));
 
 
 function swallowError(error) {
