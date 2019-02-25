@@ -6,6 +6,11 @@ const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const cleanCSS = require('gulp-clean-css');
 const pug = require('gulp-pug');
+const imagemin = require('gulp-imagemin');
+const spritesmith = require('gulp.spritesmith');
+const svgSprite = require('gulp-svg-sprite');
+const cheerio = require('gulp-cheerio');
+const replace = require('gulp-replace');
 
 const webpack = require('webpack-stream');
 
@@ -20,6 +25,8 @@ const prod = './app';
 const srcJS = `${src}/js`;
 const srcCss = `${src}/css`;
 const srcImg = `${src}/img`
+const srcImgVector = `${srcImg}/vector`
+const srcImgRaster = `${srcImg}/raster`
 const srcPug = `${src}/pug`;
 const srcAssets = `${src}/assets`;
 const prodImg = `${prod}/img`;
@@ -136,15 +143,143 @@ gulp.task('clean', function () {
 
 /**
  *
- * img copy
+ * images
  *
  * */
+
+gulp.task('img-min', function () {
+    return gulp.src([(`${srcImg}/**/*`), (`!${srcImg}/vector/**/*sprite*.svg`)])
+        .pipe(imagemin())
+        .pipe(gulp.dest(`${srcImg}`))
+});
 
 gulp.task('img:copy', function () {
     return gulp.src(`${srcJS}entrance.js`)
         .pipe(webpack(require('./gulp-webpack.dev.js')))
         .pipe(gulp.dest(srcAssetsJs));
 });
+
+gulp.task('sprite', function () {
+    return gulp.src(`${srcImg}/raster/sprite-smith/*.png`).pipe(spritesmith({
+        imgName: 'sprite.png',
+        cssName: './../../css/_global/_sprite.scss',
+        padding: 20,
+        imgPath: '/img/rastr/sprite.png',
+        algorithm: 'binary-tree',
+
+        retinaImgName: 'sprite2x.png',
+        retinaSrcFilter: './img/raster/sprite-smith/*@2x.png',
+        retinaImgPath: '/img/rastr/sprite2x.png'
+    }))
+        .pipe(gulp.dest(`${srcImg}`));
+});
+
+
+/**
+ *
+ * vector
+ *
+ * */
+
+gulp.task('svg-sprite:symbol', function () {
+    return gulp.src(`${srcImgVector}/symbol/**/*.svg`, {cwd: ""})
+        .pipe(svgSprite({
+            dest: '.',
+            mode: {
+                symbol: {
+                    prefix: '.svg-',
+                    sprite: '../sprite-symbol.svg',
+                    example: true,
+                    bust: false,
+                    render: {
+                        scss: {
+                            dest: './../../../css/_global/_sprite-symbol.scss'
+                        }
+                    }
+
+                }
+            }
+        }))
+        .on('error', swallowError)
+        .pipe(gulp.dest(srcImgVector));
+});
+
+gulp.task('svg-sprite:css', function () {
+    return gulp.src(`${srcImgVector}/css-sprite/**/*.svg`, {cwd: ""})
+        .pipe(svgSprite({
+            dest: '.',
+            shape: {
+                spacing: {         // Add padding
+                    padding: 1
+                }
+            },
+            mode: {
+                css: {
+                    prefix: '.svg-',
+                    sprite: '../sprite-css.svg',
+                    example: true,
+                    bust: false,
+                    render: {
+                        scss: {
+                            dest: './../../../css/_global/_sprite-css.scss'
+                        }
+                    }
+                }
+            }
+        }))
+        .on('error', swallowError)
+        .pipe(gulp.dest(srcImgVector));
+});
+
+gulp.task('copy:svg-symbol-template', function () {
+    return gulp.src([`${srcImgVector}/symbol/sprite.symbol.html`, `${srcImgVector}/css/sprite.css.html`])
+        .on('error', swallowError)
+        .pipe(gulp.dest(srcImgVector));
+});
+
+gulp.task('del:svg-symbol-template', function () {
+    return del([(`${srcImgVector}/symbol/sprite.symbol.html`),
+        (`${srcImgVector}/css/`)]);
+});
+
+gulp.task('symbol:remove-attrs', function () {
+    return gulp.src(`${srcImgVector}/sprite-symbol.svg`)
+        .pipe(cheerio({
+            run: function ($) {
+                $('[fill]').removeAttr('fill');
+                $('[style]').removeAttr('style');
+                $('[class]').removeAttr('class');
+                $('style').remove();
+            },
+            parserOptions: {xmlMode: true}
+        }))
+        .pipe(gulp.dest(srcImgVector));
+});
+
+gulp.task('change-path-to-svg', function () {
+    return gulp.src([`${srcImgVector}/sprite.symbol.html`, `${srcCss}/_global/_sprite-css.scss`])
+        .pipe(replace('../', '/img/vector/'))
+        .pipe(gulp.dest(function (file) {
+            return file.extname === '.html' ? `${srcImgVector}` :
+                file.extname === '.scss' ? `${srcCss}/_global/` : '';
+        }));
+});
+
+gulp.task('change-rel-path-to-svg', function () {
+    return gulp.src([`${srcImgVector}/sprite.css.html`])
+        .pipe(replace('../sprite-css.svg', './sprite-css.svg'))
+        .pipe(gulp.dest(srcImgVector))
+});
+
+gulp.task('svg',
+    gulp.series(
+        'svg-sprite:symbol',
+        'svg-sprite:css',
+        'copy:svg-symbol-template',
+        'del:svg-symbol-template',
+        gulp.parallel('symbol:remove-attrs', 'change-path-to-svg', 'change-rel-path-to-svg')
+    )
+);
 
 
 /**

@@ -3,3 +3,4 @@ function importAll (r) {
 }
 
 importAll(require.context('./scripts/', true, /\.js$/));
+importAll(require.context('./plugin-init/', true, /\.js$/));

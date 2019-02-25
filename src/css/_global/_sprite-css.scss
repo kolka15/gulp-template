@@ -1,0 +1,44 @@
+%svg-common {
+	background: url("/img/vector/sprite-css.svg") no-repeat;
+}
+
+.svg-perks-bag {
+	@extend %svg-common;
+	background-position: 99.85839275780103% 0;
+}
+
+.svg-perks-bag-dims {
+	width: 92.27px;
+	height: 90.75px;
+}
+
+.svg-perks-building {
+	@extend %svg-common;
+	background-position: 54.576687116564415% 0;
+}
+
+.svg-perks-building-dims {
+	width: 86.25px;
+	height: 97.75px;
+}
+
+.svg-perks-hands {
+	@extend %svg-common;
+	background-position: 0 100%;
+}
+
+.svg-perks-hands-dims {
+	width: 94.58px;
+	height: 100.5px;
+}
+
+.svg-perks-hat {
+	@extend %svg-common;
+	background-position: 0 0;
+}
+
+.svg-perks-hat-dims {
+	width: 111.2px;
+	height: 88.5px;
+}
+
