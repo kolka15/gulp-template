@@ -4,7 +4,7 @@
   "description": "",
   "main": "bundle.js",
   "scripts": {
-    "watch": "gulp go & gulp js:dev",
+    "start": "gulp go & gulp js:dev",
     "check": "NODE_ENV=check webpack --config gulp-webpack.prod.js"
   },
   "author": "",
