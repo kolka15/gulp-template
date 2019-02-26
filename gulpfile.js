@@ -39,6 +39,7 @@ const prodAssetsJs = `${prodAssets}/js`;
 const prodAssetsCss = `${prodAssets}/css`;
 const prodAssetsFonts = `${prodAssets}/fonts`;
 
+const githubProjectName = `cdc`
 
 const browsrSyncOpts = {
     https: false,
@@ -174,14 +175,14 @@ gulp.task('sprite', function () {
         imgName: 'sprite.png',
         cssName: './../../css/_global/_sprite.scss',
         padding: 20,
-        imgPath: '/img/rastr/sprite.png',
+        imgPath: '/img/raster/sprite.png',
         algorithm: 'binary-tree',
 
         retinaImgName: 'sprite2x.png',
-        retinaSrcFilter: './img/raster/sprite-smith/*@2x.png',
-        retinaImgPath: '/img/rastr/sprite2x.png'
+        retinaSrcFilter: `${srcImg}/raster/sprite-smith/*@2x.png`,
+        retinaImgPath: '/img/raster/sprite2x.png'
     }))
-        .pipe(gulp.dest(`${srcImg}`));
+        .pipe(gulp.dest(`${srcImg}/raster`));
 });
 
 gulp.task('img:copy', function () {
@@ -312,18 +313,17 @@ gulp.task('copy:docs', function () {
 
 gulp.task('replace_html:docs', function () {
     return gulp.src(`${docs}/*.html`)
-        .pipe(replace('/assets', '/docs/assets'))
+        .pipe(replace(`/assets`, `/${githubProjectName}/assets`))
+        .pipe(replace(`/img`, `/${githubProjectName}/img`))
         .pipe(gulp.dest(`${docs}`))
 });
 
 gulp.task('replace_css:docs', function () {
     return gulp.src(`${docs}/assets/css/*.css`)
-        .pipe(replace('/img', '/docs/img'))
-        .pipe(replace('/assets', '/docs/assets'))
+        .pipe(replace(`/img`, `/${githubProjectName}/img`))
+        .pipe(replace(`/assets`, `/${githubProjectName}/assets`))
         .pipe(gulp.dest(`${docs}/assets/css`))
 });
-
-
 
 gulp.task('docs',
     gulp.series('copy:docs', gulp.parallel('replace_html:docs', 'replace_css:docs'))
