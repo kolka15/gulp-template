@@ -10790,7 +10790,7 @@ g = (function() {
 
 try {
 	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
+	g = g || new Function("return this")();
 } catch (e) {
 	// This works if the window reference is available
 	if (typeof window === "object") g = window;
@@ -10820,6 +10820,26 @@ function importAll(r) {
 }
 
 importAll(__webpack_require__("./src/js/scripts sync recursive \\.js$"));
+importAll(__webpack_require__("./src/js/plugin-init sync recursive \\.js$"));
+
+/***/ }),
+
+/***/ "./src/js/plugin-init sync recursive \\.js$":
+/*!***************************************!*\
+  !*** ./src/js/plugin-init sync \.js$ ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function webpackEmptyContext(req) {
+	var e = new Error("Cannot find module '" + req + "'");
+	e.code = 'MODULE_NOT_FOUND';
+	throw e;
+}
+webpackEmptyContext.keys = function() { return []; };
+webpackEmptyContext.resolve = webpackEmptyContext;
+module.exports = webpackEmptyContext;
+webpackEmptyContext.id = "./src/js/plugin-init sync recursive \\.js$";
 
 /***/ }),
 
@@ -10840,13 +10860,12 @@ function webpackContext(req) {
 	return __webpack_require__(id);
 }
 function webpackContextResolve(req) {
-	var id = map[req];
-	if(!(id + 1)) { // check for number or string
+	if(!__webpack_require__.o(map, req)) {
 		var e = new Error("Cannot find module '" + req + "'");
 		e.code = 'MODULE_NOT_FOUND';
 		throw e;
 	}
-	return id;
+	return map[req];
 }
 webpackContext.keys = function webpackContextKeys() {
 	return Object.keys(map);
